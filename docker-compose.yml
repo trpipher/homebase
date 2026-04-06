@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    container_name: pipher-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      DATABASE_URL: "file:/app/data/dev.db"
+      AUTH_SECRET: "${AUTH_SECRET}"
+    restart: unless-stopped
