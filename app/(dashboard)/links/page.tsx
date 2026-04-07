@@ -38,7 +38,7 @@ export default function LinksPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
-      if (!res.ok) { toast.error("Failed to save link"); setSaving(false); return }
+      if (!res.ok) { toast.error("Failed to save link"); return }
       toast.success("Link updated")
     } else {
       const res = await fetch("/api/links", {
@@ -46,7 +46,7 @@ export default function LinksPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
-      if (!res.ok) { toast.error("Failed to save link"); setSaving(false); return }
+      if (!res.ok) { toast.error("Failed to save link"); return }
       toast.success("Link added")
     }
     setEditing(null)
