@@ -14,6 +14,10 @@ export default function BillsPage() {
 
   async function load() {
     const res = await fetch("/api/bills")
+    if (!res.ok) {
+      toast.error("Failed to load bills")
+      return
+    }
     const data = await res.json()
     setBills(data)
   }
@@ -22,18 +26,20 @@ export default function BillsPage() {
 
   async function handleSave(data: Omit<BillItem, "id" | "createdAt">) {
     if (editing) {
-      await fetch(`/api/bills/${editing.id}`, {
+      const res = await fetch(`/api/bills/${editing.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
+      if (!res.ok) { toast.error("Failed to save bill"); return }
       toast.success("Bill updated")
     } else {
-      await fetch("/api/bills", {
+      const res = await fetch("/api/bills", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
+      if (!res.ok) { toast.error("Failed to save bill"); return }
       toast.success("Bill added")
     }
     setEditing(null)
@@ -42,7 +48,8 @@ export default function BillsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this bill?")) return
-    await fetch(`/api/bills/${id}`, { method: "DELETE" })
+    const res = await fetch(`/api/bills/${id}`, { method: "DELETE" })
+    if (!res.ok) { toast.error("Failed to delete bill"); return }
     toast.success("Bill deleted")
     load()
   }
@@ -52,7 +59,7 @@ export default function BillsPage() {
     setFormOpen(true)
   }
 
-  const upcomingBills = bills.filter((b) => b.dueDay !== null).sort(
+  const upcomingBills = bills.filter((b) => b.dueDay != null).sort(
     (a, b) => (a.dueDay ?? 99) - (b.dueDay ?? 99)
   )
   const noDueDateBills = bills.filter((b) => b.dueDay === null)
@@ -60,7 +67,7 @@ export default function BillsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Bills</h1>
+        <h1 className="font-heading text-2xl font-bold">Bills</h1>
         <Button
           size="sm"
           onClick={() => {
@@ -94,7 +101,7 @@ export default function BillsPage() {
               <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
                 By Due Date
               </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {upcomingBills.map((bill) => (
                   <BillCard
                     key={bill.id}
@@ -111,7 +118,7 @@ export default function BillsPage() {
               <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
                 Other Bills
               </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {noDueDateBills.map((bill) => (
                   <BillCard
                     key={bill.id}

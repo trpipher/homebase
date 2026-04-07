@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
 import { LinkCard, type LinkItem } from "@/components/links/LinkCard"
@@ -16,6 +15,10 @@ export default function LinksPage() {
 
   async function load() {
     const res = await fetch("/api/links")
+    if (!res.ok) {
+      toast.error("Failed to load links")
+      return
+    }
     const data = await res.json()
     setLinks(data)
   }
@@ -30,18 +33,20 @@ export default function LinksPage() {
 
   async function handleSave(data: Omit<LinkItem, "id" | "createdAt">) {
     if (editing) {
-      await fetch(`/api/links/${editing.id}`, {
+      const res = await fetch(`/api/links/${editing.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
+      if (!res.ok) { toast.error("Failed to save link"); return }
       toast.success("Link updated")
     } else {
-      await fetch("/api/links", {
+      const res = await fetch("/api/links", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
+      if (!res.ok) { toast.error("Failed to save link"); return }
       toast.success("Link added")
     }
     setEditing(null)
@@ -50,7 +55,8 @@ export default function LinksPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this link?")) return
-    await fetch(`/api/links/${id}`, { method: "DELETE" })
+    const res = await fetch(`/api/links/${id}`, { method: "DELETE" })
+    if (!res.ok) { toast.error("Failed to delete link"); return }
     toast.success("Link deleted")
     load()
   }
@@ -63,7 +69,7 @@ export default function LinksPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Family Links</h1>
+        <h1 className="font-heading text-2xl font-bold">Family Links</h1>
         <Button
           size="sm"
           onClick={() => {
@@ -80,10 +86,10 @@ export default function LinksPage() {
         <div className="flex items-center gap-2 flex-wrap mb-6">
           <button
             onClick={() => setActiveCategory(null)}
-            className={`text-sm px-3 py-1 rounded-full border transition-colors ${
+            className={`text-sm px-3 py-1 rounded-full transition-colors ${
               activeCategory === null
-                ? "bg-foreground text-background border-foreground"
-                : "border-border hover:border-foreground/30"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
             }`}
           >
             All
@@ -92,10 +98,10 @@ export default function LinksPage() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
-              className={`text-sm px-3 py-1 rounded-full border transition-colors ${
+              className={`text-sm px-3 py-1 rounded-full transition-colors ${
                 activeCategory === cat
-                  ? "bg-foreground text-background border-foreground"
-                  : "border-border hover:border-foreground/30"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
               }`}
             >
               {cat}

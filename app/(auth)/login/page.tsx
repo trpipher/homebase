@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
 function GoogleIcon() {
@@ -69,10 +69,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="text-3xl font-bold mb-1">Pipher.Dev</div>
-          <CardTitle className="text-base font-normal text-muted-foreground">
-            Family Dashboard
-          </CardTitle>
+          <div className="font-heading text-3xl font-bold mb-1">Pipher.Dev</div>
+          <p className="text-sm text-muted-foreground">Your family homebase</p>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Google OAuth */}
@@ -122,7 +120,7 @@ export default function LoginPage() {
               <p className="text-sm text-destructive">{error}</p>
             )}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in…" : "Sign in with Email"}
+              {loading ? "Signing in…" : "Sign In"}
             </Button>
           </form>
         </CardContent>
