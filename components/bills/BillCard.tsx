@@ -30,35 +30,51 @@ function ordinal(n: number) {
 }
 
 export function BillCard({ bill, onEdit, onDelete }: BillCardProps) {
-  const [expanded, setExpanded] = useState(false)
-
-  const hasDetails = bill.accountNum || bill.notes
+  const [notesExpanded, setNotesExpanded] = useState(false)
 
   return (
-    <Card className="group hover:shadow-md transition-shadow">
+    <Card className="group">
       <CardContent className="pt-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-              <span className="font-medium text-sm">{bill.name}</span>
-              {bill.provider && (
-                <span className="text-xs text-muted-foreground">{bill.provider}</span>
-              )}
-              {bill.dueDay && (
-                <Badge variant="outline" className="text-xs">
-                  Due {ordinal(bill.dueDay)}
-                </Badge>
-              )}
-            </div>
+        {/* Name + due badge */}
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <span className="font-semibold text-sm">{bill.name}</span>
+          {bill.dueDay && (
+            <Badge variant="secondary" className="shrink-0">
+              Due {ordinal(bill.dueDay)}
+            </Badge>
+          )}
+        </div>
+
+        {/* Provider */}
+        {bill.provider && (
+          <p className="text-xs text-muted-foreground mb-3">{bill.provider}</p>
+        )}
+
+        {/* Divider + account + actions */}
+        <div className="border-t border-border pt-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            {bill.accountNum && (
+              <span className="text-xs text-muted-foreground font-mono truncate">
+                ···{bill.accountNum.slice(-4)}
+              </span>
+            )}
+            {bill.notes && (
+              <button
+                className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setNotesExpanded((v) => !v)}
+              >
+                {notesExpanded ? (
+                  <ChevronUp className="h-3 w-3" />
+                ) : (
+                  <ChevronDown className="h-3 w-3" />
+                )}
+                Notes
+              </button>
+            )}
           </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <a
-              href={bill.websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex"
-            >
-              <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+          <div className="flex items-center gap-1">
+            <a href={bill.websiteUrl} target="_blank" rel="noopener noreferrer">
+              <Button size="sm" className="h-7 text-xs gap-1">
                 Pay Now
                 <ExternalLink className="h-3 w-3" />
               </Button>
@@ -84,32 +100,11 @@ export function BillCard({ bill, onEdit, onDelete }: BillCardProps) {
           </div>
         </div>
 
-        {hasDetails && (
-          <>
-            <button
-              className="flex items-center gap-1 text-xs text-muted-foreground mt-2 hover:text-foreground transition-colors"
-              onClick={() => setExpanded((v) => !v)}
-            >
-              {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              {expanded ? "Hide details" : "Show details"}
-            </button>
-            {expanded && (
-              <div className="mt-3 text-xs space-y-1 border-t pt-3">
-                {bill.accountNum && (
-                  <div>
-                    <span className="text-muted-foreground">Account #: </span>
-                    <span className="font-mono">{bill.accountNum}</span>
-                  </div>
-                )}
-                {bill.notes && (
-                  <div>
-                    <span className="text-muted-foreground">Notes: </span>
-                    <span>{bill.notes}</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </>
+        {/* Notes expand */}
+        {notesExpanded && bill.notes && (
+          <div className="mt-3 text-xs text-muted-foreground border-t border-border pt-3">
+            {bill.notes}
+          </div>
         )}
       </CardContent>
     </Card>

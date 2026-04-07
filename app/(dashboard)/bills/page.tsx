@@ -60,7 +60,7 @@ export default function BillsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Bills</h1>
+        <h1 className="font-heading text-2xl font-bold">Bills</h1>
         <Button
           size="sm"
           onClick={() => {
@@ -94,7 +94,7 @@ export default function BillsPage() {
               <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
                 By Due Date
               </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {upcomingBills.map((bill) => (
                   <BillCard
                     key={bill.id}
@@ -111,7 +111,7 @@ export default function BillsPage() {
               <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
                 Other Bills
               </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {noDueDateBills.map((bill) => (
                   <BillCard
                     key={bill.id}
