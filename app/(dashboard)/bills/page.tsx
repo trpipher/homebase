@@ -26,18 +26,20 @@ export default function BillsPage() {
 
   async function handleSave(data: Omit<BillItem, "id" | "createdAt">) {
     if (editing) {
-      await fetch(`/api/bills/${editing.id}`, {
+      const res = await fetch(`/api/bills/${editing.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
+      if (!res.ok) { toast.error("Failed to save bill"); return }
       toast.success("Bill updated")
     } else {
-      await fetch("/api/bills", {
+      const res = await fetch("/api/bills", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
+      if (!res.ok) { toast.error("Failed to save bill"); return }
       toast.success("Bill added")
     }
     setEditing(null)
@@ -46,7 +48,8 @@ export default function BillsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this bill?")) return
-    await fetch(`/api/bills/${id}`, { method: "DELETE" })
+    const res = await fetch(`/api/bills/${id}`, { method: "DELETE" })
+    if (!res.ok) { toast.error("Failed to delete bill"); return }
     toast.success("Bill deleted")
     load()
   }
