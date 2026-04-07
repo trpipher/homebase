@@ -23,6 +23,15 @@ interface BillCardProps {
   onDelete: (id: string) => void
 }
 
+function isSafeUrl(url: string) {
+  try {
+    const parsed = new URL(url)
+    return parsed.protocol === "https:" || parsed.protocol === "http:"
+  } catch {
+    return false
+  }
+}
+
 function ordinal(n: number) {
   const s = ["th", "st", "nd", "rd"]
   const v = n % 100
@@ -60,7 +69,8 @@ export function BillCard({ bill, onEdit, onDelete }: BillCardProps) {
             )}
             {bill.notes && (
               <button
-                className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 rounded"
+                aria-label={notesExpanded ? "Collapse notes" : "Expand notes"}
                 onClick={() => setNotesExpanded((v) => !v)}
               >
                 {notesExpanded ? (
@@ -73,17 +83,20 @@ export function BillCard({ bill, onEdit, onDelete }: BillCardProps) {
             )}
           </div>
           <div className="flex items-center gap-1">
-            <a href={bill.websiteUrl} target="_blank" rel="noopener noreferrer">
-              <Button size="sm" className="h-7 text-xs gap-1">
-                Pay Now
-                <ExternalLink className="h-3 w-3" />
-              </Button>
-            </a>
+            {isSafeUrl(bill.websiteUrl) && (
+              <a href={bill.websiteUrl} target="_blank" rel="noopener noreferrer">
+                <Button size="sm" className="h-7 text-xs gap-1">
+                  Pay Now
+                  <ExternalLink className="h-3 w-3" />
+                </Button>
+              </a>
+            )}
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7"
+                aria-label={`Edit ${bill.name}`}
                 onClick={() => onEdit(bill)}
               >
                 <Pencil className="h-3.5 w-3.5" />
@@ -92,6 +105,7 @@ export function BillCard({ bill, onEdit, onDelete }: BillCardProps) {
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 text-destructive hover:text-destructive"
+                aria-label={`Delete ${bill.name}`}
                 onClick={() => onDelete(bill.id)}
               >
                 <Trash2 className="h-3.5 w-3.5" />

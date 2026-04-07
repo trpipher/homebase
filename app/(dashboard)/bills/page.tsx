@@ -14,6 +14,10 @@ export default function BillsPage() {
 
   async function load() {
     const res = await fetch("/api/bills")
+    if (!res.ok) {
+      toast.error("Failed to load bills")
+      return
+    }
     const data = await res.json()
     setBills(data)
   }
@@ -52,7 +56,7 @@ export default function BillsPage() {
     setFormOpen(true)
   }
 
-  const upcomingBills = bills.filter((b) => b.dueDay !== null).sort(
+  const upcomingBills = bills.filter((b) => b.dueDay != null).sort(
     (a, b) => (a.dueDay ?? 99) - (b.dueDay ?? 99)
   )
   const noDueDateBills = bills.filter((b) => b.dueDay === null)
