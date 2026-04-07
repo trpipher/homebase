@@ -33,18 +33,20 @@ export default function LinksPage() {
 
   async function handleSave(data: Omit<LinkItem, "id" | "createdAt">) {
     if (editing) {
-      await fetch(`/api/links/${editing.id}`, {
+      const res = await fetch(`/api/links/${editing.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
+      if (!res.ok) { toast.error("Failed to save link"); setSaving(false); return }
       toast.success("Link updated")
     } else {
-      await fetch("/api/links", {
+      const res = await fetch("/api/links", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
+      if (!res.ok) { toast.error("Failed to save link"); setSaving(false); return }
       toast.success("Link added")
     }
     setEditing(null)
@@ -53,7 +55,8 @@ export default function LinksPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this link?")) return
-    await fetch(`/api/links/${id}`, { method: "DELETE" })
+    const res = await fetch(`/api/links/${id}`, { method: "DELETE" })
+    if (!res.ok) { toast.error("Failed to delete link"); return }
     toast.success("Link deleted")
     load()
   }
