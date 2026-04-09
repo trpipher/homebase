@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await req.json()
-  const { name, provider, websiteUrl, accountNum, dueDay, notes } = body
+  const { name, provider, websiteUrl, accountNum, dueDay, amount, autopay, notes } = body
 
   if (!name || !websiteUrl) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -28,6 +28,8 @@ export async function POST(req: Request) {
       websiteUrl,
       accountNum: accountNum || null,
       dueDay: dueDay ? Number(dueDay) : null,
+      amount: amount != null ? Number(amount) : null,
+      autopay: autopay === true,
       notes: notes || null,
     },
   })
