@@ -1,10 +1,13 @@
 {
   "permissions": {
     "allow": [
+      "Bash",
       "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --no-eslint --import-alias \"@/*\" --yes)",
       "Bash(npm --version)",
       "Bash(mkdir -p /c/Users/trpip/AppData/Roaming/npm)",
-      "Bash(npx create-next-app@latest \"D:/Development/PipherDev\" --typescript --tailwind --app --no-src-dir --no-eslint --import-alias \"@/*\" --yes)"
+      "Bash(npx create-next-app@latest \"D:/Development/PipherDev\" --typescript --tailwind --app --no-src-dir --no-eslint --import-alias \"@/*\" --yes)",
+      "Bash(node -e \"require\\('lightningcss-linux-x64-gnu'\\)\")",
+      "Bash(node -e \"require\\('lightningcss'\\)\")"
     ]
   }
 }
