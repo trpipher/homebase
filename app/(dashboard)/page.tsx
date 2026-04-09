@@ -74,15 +74,21 @@ export default async function HomePage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-secondary border-secondary shadow-none">
+        <Card>
           <CardContent className="pt-5">
-            <p className="text-xs uppercase tracking-widest text-secondary-foreground/70 mb-2">
-              Finance
-            </p>
-            <div className="font-heading text-xl font-bold text-secondary-foreground mt-2">
-              Coming Soon
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Monthly</p>
+            <div className="font-heading text-4xl font-bold text-primary">
+              ${bills.reduce((sum, b) => sum + (b.amount ?? 0), 0).toFixed(0)}
             </div>
-            <p className="text-xs text-secondary-foreground/70 mt-1">Plaid integration</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {bills.filter((b) => b.autopay).length} on autopay
+            </p>
+            <Link
+              href="/bills"
+              className="text-xs text-primary hover:underline mt-3 inline-block"
+            >
+              View bills →
+            </Link>
           </CardContent>
         </Card>
       </div>
