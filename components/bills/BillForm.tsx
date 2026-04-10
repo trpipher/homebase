@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Dialog,
@@ -28,6 +29,8 @@ export function BillForm({ open, onClose, onSave, initial }: BillFormProps) {
   const [websiteUrl, setWebsiteUrl] = useState("")
   const [accountNum, setAccountNum] = useState("")
   const [dueDay, setDueDay] = useState("")
+  const [amount, setAmount] = useState("")
+  const [autopay, setAutopay] = useState(false)
   const [notes, setNotes] = useState("")
   const [saving, setSaving] = useState(false)
 
@@ -38,6 +41,8 @@ export function BillForm({ open, onClose, onSave, initial }: BillFormProps) {
       setWebsiteUrl(initial.websiteUrl)
       setAccountNum(initial.accountNum ?? "")
       setDueDay(initial.dueDay?.toString() ?? "")
+      setAmount(initial.amount != null ? initial.amount.toString() : "")
+      setAutopay(initial.autopay)
       setNotes(initial.notes ?? "")
     } else {
       setName("")
@@ -45,6 +50,8 @@ export function BillForm({ open, onClose, onSave, initial }: BillFormProps) {
       setWebsiteUrl("")
       setAccountNum("")
       setDueDay("")
+      setAmount("")
+      setAutopay(false)
       setNotes("")
     }
   }, [initial, open])
@@ -58,6 +65,8 @@ export function BillForm({ open, onClose, onSave, initial }: BillFormProps) {
       websiteUrl,
       accountNum: accountNum || null,
       dueDay: dueDay ? Number(dueDay) : null,
+      amount: amount !== "" ? Number(amount) : null,
+      autopay,
       notes: notes || null,
     })
     setSaving(false)
@@ -124,13 +133,40 @@ export function BillForm({ open, onClose, onSave, initial }: BillFormProps) {
               />
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="bf-amount">Monthly Cost (optional)</Label>
+              <Input
+                id="bf-amount"
+                type="number"
+                min={0}
+                step={0.01}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="29.99"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="bf-autopay">Autopay</Label>
+              <div className="flex items-center h-9 gap-2">
+                <Switch
+                  id="bf-autopay"
+                  checked={autopay}
+                  onCheckedChange={setAutopay}
+                />
+                <span className="text-sm text-muted-foreground">
+                  {autopay ? "On" : "Off"}
+                </span>
+              </div>
+            </div>
+          </div>
           <div className="space-y-1.5">
             <Label htmlFor="bf-notes">Notes (optional)</Label>
             <Textarea
               id="bf-notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Auto-pay enabled, paperless billing"
+              placeholder="Login instructions, paperless billing, etc."
               rows={2}
             />
           </div>

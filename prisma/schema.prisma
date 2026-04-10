@@ -74,6 +74,8 @@ model Bill {
   websiteUrl String
   accountNum String?
   dueDay     Int?
+  amount     Float?
+  autopay    Boolean  @default(false)
   notes      String?
   createdAt  DateTime @default(now())
 }

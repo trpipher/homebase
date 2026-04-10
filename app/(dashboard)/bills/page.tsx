@@ -54,6 +54,16 @@ export default function BillsPage() {
     load()
   }
 
+  async function handleToggleAutopay(id: string, autopay: boolean) {
+    const res = await fetch(`/api/bills/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ autopay }),
+    })
+    if (!res.ok) throw new Error("Failed to update autopay")
+    setBills((prev) => prev.map((b) => b.id === id ? { ...b, autopay } : b))
+  }
+
   function openEdit(bill: BillItem) {
     setEditing(bill)
     setFormOpen(true)
@@ -63,6 +73,9 @@ export default function BillsPage() {
     (a, b) => (a.dueDay ?? 99) - (b.dueDay ?? 99)
   )
   const noDueDateBills = bills.filter((b) => b.dueDay === null)
+
+  const totalMonthly = bills.reduce((sum, b) => sum + (b.amount ?? 0), 0)
+  const autopayCount = bills.filter((b) => b.autopay).length
 
   return (
     <div>
@@ -79,6 +92,23 @@ export default function BillsPage() {
           Add Bill
         </Button>
       </div>
+
+      {bills.length > 0 && (
+        <div className="grid grid-cols-3 gap-4 mb-8 p-4 rounded-xl border border-border bg-card">
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Monthly Total</p>
+            <p className="text-2xl font-bold text-primary">${totalMonthly.toFixed(2)}</p>
+          </div>
+          <div className="text-center border-x border-border">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Bills</p>
+            <p className="text-2xl font-bold">{bills.length}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">On Autopay</p>
+            <p className="text-2xl font-bold">{autopayCount}</p>
+          </div>
+        </div>
+      )}
 
       {bills.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
@@ -108,6 +138,7 @@ export default function BillsPage() {
                     bill={bill}
                     onEdit={openEdit}
                     onDelete={handleDelete}
+                    onToggleAutopay={handleToggleAutopay}
                   />
                 ))}
               </div>
@@ -125,6 +156,7 @@ export default function BillsPage() {
                     bill={bill}
                     onEdit={openEdit}
                     onDelete={handleDelete}
+                    onToggleAutopay={handleToggleAutopay}
                   />
                 ))}
               </div>

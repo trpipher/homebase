@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ExternalLink, Pencil, Trash2, ChevronDown, ChevronUp } from "lucide-react"
+import { ExternalLink, Pencil, Trash2, ChevronDown, ChevronUp, RefreshCw } from "lucide-react"
 
 export interface BillItem {
   id: string
@@ -13,6 +13,8 @@ export interface BillItem {
   websiteUrl: string
   accountNum?: string | null
   dueDay?: number | null
+  amount?: number | null
+  autopay: boolean
   notes?: string | null
   createdAt: string
 }
@@ -21,6 +23,7 @@ interface BillCardProps {
   bill: BillItem
   onEdit: (bill: BillItem) => void
   onDelete: (id: string) => void
+  onToggleAutopay: (id: string, autopay: boolean) => Promise<void>
 }
 
 function isSafeUrl(url: string) {
@@ -38,8 +41,23 @@ function ordinal(n: number) {
   return n + (s[(v - 20) % 10] || s[v] || s[0])
 }
 
-export function BillCard({ bill, onEdit, onDelete }: BillCardProps) {
+export function BillCard({ bill, onEdit, onDelete, onToggleAutopay }: BillCardProps) {
   const [notesExpanded, setNotesExpanded] = useState(false)
+  const [autopay, setAutopay] = useState(bill.autopay)
+  const [togglingAutopay, setTogglingAutopay] = useState(false)
+
+  async function handleAutopayClick() {
+    const next = !autopay
+    setAutopay(next) // optimistic
+    setTogglingAutopay(true)
+    try {
+      await onToggleAutopay(bill.id, next)
+    } catch {
+      setAutopay(!next) // revert on error
+    } finally {
+      setTogglingAutopay(false)
+    }
+  }
 
   return (
     <Card className="group">
@@ -56,10 +74,20 @@ export function BillCard({ bill, onEdit, onDelete }: BillCardProps) {
 
         {/* Provider */}
         {bill.provider && (
-          <p className="text-xs text-muted-foreground mb-3">{bill.provider}</p>
+          <p className="text-xs text-muted-foreground mb-2">{bill.provider}</p>
         )}
 
-        {/* Divider + account + actions */}
+        {/* Amount */}
+        {bill.amount != null ? (
+          <p className="text-lg font-bold text-primary mb-1">
+            ${bill.amount.toFixed(2)}
+            <span className="text-xs font-normal text-muted-foreground"> /mo</span>
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground/50 mb-1">No amount set</p>
+        )}
+
+        {/* Divider + footer */}
         <div className="border-t border-border pt-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             {bill.accountNum && (
@@ -67,6 +95,23 @@ export function BillCard({ bill, onEdit, onDelete }: BillCardProps) {
                 ···{bill.accountNum.slice(-4)}
               </span>
             )}
+
+            {/* Autopay toggle */}
+            <button
+              onClick={handleAutopayClick}
+              disabled={togglingAutopay}
+              aria-label={autopay ? "Autopay on — click to disable" : "Autopay off — click to enable"}
+              className={
+                autopay
+                  ? "flex items-center gap-1 text-xs font-medium rounded-full px-2 py-0.5 transition-colors bg-[oklch(0.9_0.05_155)] text-[oklch(0.38_0.09_155)] hover:bg-[oklch(0.85_0.07_155)]"
+                  : "flex items-center gap-1 text-xs rounded-full px-2 py-0.5 transition-colors border border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary"
+              }
+            >
+              <RefreshCw className="h-3 w-3" />
+              Auto
+            </button>
+
+            {/* Notes toggle */}
             {bill.notes && (
               <button
                 className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 rounded"
@@ -82,6 +127,7 @@ export function BillCard({ bill, onEdit, onDelete }: BillCardProps) {
               </button>
             )}
           </div>
+
           <div className="flex items-center gap-1">
             {isSafeUrl(bill.websiteUrl) && (
               <a href={bill.websiteUrl} target="_blank" rel="noopener noreferrer">
